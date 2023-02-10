@@ -1,17 +1,18 @@
 package com.example.rc_app
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.ui.AppBarConfiguration
 import com.example.rc_app.databinding.ActivityMainBinding
+import com.example.rc_app.entity.Receipt
+import com.example.rc_app.storage.GalleryRepository
+import com.example.rc_app.storage.InternalRepository
 
 class MainActivity : AppCompatActivity() {
+
+    private val repo: InternalRepository<Receipt> by lazy { GalleryRepository(this) }
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
