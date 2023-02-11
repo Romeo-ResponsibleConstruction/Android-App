@@ -114,7 +114,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragmentContainerView"
-                android:name="com.example.rc_app.GalleryFragment"
+                android:name="com.example.rc_app.gallery.GalleryFragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

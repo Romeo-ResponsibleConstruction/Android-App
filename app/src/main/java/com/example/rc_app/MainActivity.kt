@@ -8,9 +8,8 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.rc_app.databinding.ActivityMainBinding
-import com.example.rc_app.entity.Receipt
-import com.example.rc_app.storage.GalleryRepository
-import java.time.Instant
+import com.example.rc_app.entity.receipt.Receipt
+import com.example.rc_app.gallery.GalleryRepository
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,17 +22,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        TODO("remove below")
+        galleryRepo = GalleryRepository(this.applicationContext)
 
-//        galleryRepo = GalleryRepository(this.applicationContext)
-//
-//        val button: Button = findViewById(R.id.button2)
-//        button.setOnClickListener {
-//            val testRecpt = Receipt(BitmapFactory.decodeResource(applicationContext.resources, R.drawable)
-//            )
-//            galleryRepo.saveToInternalStorage(testRecpt)
-//            Log.d("test-123", "hello-world")
-//        }
+        val button: Button = findViewById(R.id.button2)
+        button.setOnClickListener {
+            val testRecpt = Receipt(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.headshot)
+            )
+            galleryRepo.saveToInternalStorage(testRecpt)
+            Log.d("test-123", "hello-world")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
