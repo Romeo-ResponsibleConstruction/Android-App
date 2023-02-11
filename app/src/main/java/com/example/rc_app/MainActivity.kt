@@ -1,20 +1,20 @@
 package com.example.rc_app
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import com.example.rc_app.databinding.ActivityMainBinding
+import com.example.rc_app.entity.receipt.Receipt
+import com.example.rc_app.gallery.GalleryRepository
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var galleryRepo: GalleryRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +22,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        galleryRepo = GalleryRepository(this.applicationContext)
+
+        val button: Button = findViewById(R.id.button2)
+        button.setOnClickListener {
+            val testRecpt = Receipt(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.headshot)
+            )
+            galleryRepo.saveToInternalStorage(testRecpt)
+            Log.d("test-123", "hello-world")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -39,5 +48,7 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+
 
 }
