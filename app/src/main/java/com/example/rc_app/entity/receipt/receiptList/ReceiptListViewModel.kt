@@ -1,4 +1,4 @@
-package com.example.rc_app.gallery.receiptList
+package com.example.rc_app.entity.receipt.receiptList
 
 class ReceiptListViewModel {
 }
