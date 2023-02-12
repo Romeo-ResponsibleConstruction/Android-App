@@ -8,6 +8,8 @@
         <entry key="app/src/main/res/layout/fragment_first.xml" value="0.15476190476190477" />
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_second.xml" value="0.15476190476190477" />
+        <entry key="app/src/main/res/layout/receipt_item.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/sample_receipt_view.xml" value="0.271875" />
       </map>
     </option>
   </component>

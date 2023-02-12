@@ -11,14 +11,10 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class GalleryRepository(context: Context) : GeneralFileRepository<Receipt>(context),
+class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(context),
     InternalRepository<Receipt> {
 
-    private fun calToString(calendar: GregorianCalendar): String {
-        val format = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
-        format.calendar = calendar
-        return format.format(calendar.time)
-    }
+    private val dir = "imageDir"
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name
@@ -46,14 +42,24 @@ class GalleryRepository(context: Context) : GeneralFileRepository<Receipt>(conte
             filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
 
+
         return saveFile(
-            "imageDir",
-            "${calToString(filetype.datetime)}_${filetype.id}.png",
+            dir,
+            "${(filetype.datetimeToString())}_${filetype.id}.png",
             compress
         )
     }
 
     override fun getFromInternalStorage(filepath: String): Receipt {
-        return pathToReceipt(getFile("imageDir/$filepath"))
+        return pathToReceipt(getFile("$dir/$filepath"))
+    }
+
+    fun getAllFromStorage(): List<Receipt> {
+        val directory = File(context.filesDir, dir)
+        val fileList = directory.listFiles()
+        if (fileList != null) {
+            return fileList.asSequence().map { pathToReceipt(it) }.toList()
+        }
+        return emptyList()
     }
 }
