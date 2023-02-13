@@ -7,7 +7,9 @@ import android.graphics.BitmapFactory
 import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.storage.GeneralFileRepository
 import com.example.rc_app.storage.InternalRepository
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,7 +29,10 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         val calendar = GregorianCalendar()
         calendar.time = date
 
-        val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+        val options = BitmapFactory.Options()
+        options.inPreferredConfig = Bitmap.Config.RGB_565
+        val bitmap = BitmapFactory.decodeStream(FileInputStream(file), null, options)
+
         bitmap?.let {
             return Receipt(
                 bitmap,
@@ -40,7 +45,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
 
     override fun saveToInternalStorage(filetype: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
-            filetype.image.compress(Bitmap.CompressFormat.PNG, 50, fos)
+            filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
 
 
