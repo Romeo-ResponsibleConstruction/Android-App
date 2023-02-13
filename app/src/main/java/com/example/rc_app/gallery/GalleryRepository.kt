@@ -1,8 +1,10 @@
 package com.example.rc_app.gallery
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.storage.GeneralFileRepository
 import com.example.rc_app.storage.InternalRepository
@@ -18,7 +20,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name
-        val (cal: String, uuid) = tailPath.split("_")
+        val (cal: String, uuid, _) = tailPath.split("_",".")
 
         val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
         val date: Date? = df.parse(cal)
@@ -51,15 +53,17 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
     }
 
     override fun getFromInternalStorage(filepath: String): Receipt {
-        return pathToReceipt(getFile("$dir/$filepath"))
+        return pathToReceipt(getFile(dir, filepath))
     }
 
     fun getAllFromStorage(): List<Receipt> {
-        val directory = File(context.filesDir, dir)
+        val cw = ContextWrapper(context)
+        val directory: File = cw.getDir(dir, Context.MODE_PRIVATE)
         val fileList = directory.listFiles()
         if (fileList != null) {
             return fileList.asSequence().map { pathToReceipt(it) }.toList()
         }
+
         return emptyList()
     }
 }

@@ -23,6 +23,7 @@ private const val FILE_NAME = "photo.jpg"
 private const val REQUEST_CODE = 99
 private lateinit var photoFile: File
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -51,13 +52,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Unable to open camera.", Toast.LENGTH_SHORT).show()
             }
-
-            /*
-            val testRecpt = Receipt(BitmapFactory.decodeResource(applicationContext.resources, R.drawable.headshot)
-            )
-            galleryRepo.saveToInternalStorage(testRecpt)
-            Log.d("test-123", "hello-world")
-             */
 
         }
     }
