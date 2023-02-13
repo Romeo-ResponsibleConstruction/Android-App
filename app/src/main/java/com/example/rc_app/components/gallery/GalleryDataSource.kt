@@ -1,7 +1,6 @@
-package com.example.rc_app.gallery
+package com.example.rc_app.components.gallery
 
 import android.content.Context
-import android.content.res.Resources
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.rc_app.entity.receipt.Receipt

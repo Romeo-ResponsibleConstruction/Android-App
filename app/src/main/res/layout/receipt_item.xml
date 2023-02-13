@@ -3,18 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/receiptImage"
         android:layout_width="150dp"
         android:layout_height="210dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.204"
         tools:layout_conversion_absoluteHeight="230dp"
         tools:layout_conversion_absoluteWidth="165dp"
         tools:srcCompat="@tools:sample/avatars" />
@@ -24,11 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="hello world"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/receiptImage"
-        app:layout_constraintVertical_bias="0.08"
         tools:layout_conversion_absoluteHeight="19dp"
         tools:layout_conversion_absoluteWidth="0dp" />
 

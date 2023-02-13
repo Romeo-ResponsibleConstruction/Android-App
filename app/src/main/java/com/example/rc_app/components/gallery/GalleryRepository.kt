@@ -1,10 +1,9 @@
-package com.example.rc_app.gallery
+package com.example.rc_app.components.gallery
 
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
 import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.storage.GeneralFileRepository
 import com.example.rc_app.storage.InternalRepository
@@ -41,7 +40,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
 
     override fun saveToInternalStorage(filetype: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
-            filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            filetype.image.compress(Bitmap.CompressFormat.PNG, 50, fos)
         }
 
 
