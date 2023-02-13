@@ -15,4 +15,5 @@ class Receipt (
     fun idToString(): String {
         return id.toString()
     }
+
 }

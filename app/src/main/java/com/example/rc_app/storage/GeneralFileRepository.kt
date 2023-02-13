@@ -24,13 +24,17 @@ abstract class GeneralFileRepository<T>(private val context: Context) : Internal
         return directory.absolutePath
     }
 
-    protected fun getFile(filepath: String): File {
-        return File(context.filesDir, filepath)
+    protected fun getFile(parentdir: String, filename: String): File {
+        val cw = ContextWrapper(context)
+        val directory: File = cw.getDir(parentdir, Context.MODE_PRIVATE)
+
+        return File(directory, filename)
     }
 
     override fun deleteFromInternalStorage(filepath: String): Boolean {
-        val dir = context.filesDir
-        val file = File(dir, filepath)
+        val cw = ContextWrapper(context)
+        val directory: File = cw.getDir(filepath, Context.MODE_PRIVATE)
+        val file = File(directory, filepath)
         return file.delete()
     }
 }

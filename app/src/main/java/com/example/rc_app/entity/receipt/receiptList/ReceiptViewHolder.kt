@@ -1,5 +1,6 @@
 package com.example.rc_app.entity.receipt.receiptList
 
+import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView

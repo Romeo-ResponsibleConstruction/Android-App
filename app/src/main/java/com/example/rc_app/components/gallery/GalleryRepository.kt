@@ -1,12 +1,15 @@
-package com.example.rc_app.gallery
+package com.example.rc_app.components.gallery
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.storage.GeneralFileRepository
 import com.example.rc_app.storage.InternalRepository
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -18,7 +21,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name
-        val (cal: String, uuid) = tailPath.split("_")
+        val (cal: String, uuid, _) = tailPath.split("_",".")
 
         val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
         val date: Date? = df.parse(cal)
@@ -26,7 +29,10 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         val calendar = GregorianCalendar()
         calendar.time = date
 
-        val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+        val options = BitmapFactory.Options()
+        options.inPreferredConfig = Bitmap.Config.RGB_565
+        val bitmap = BitmapFactory.decodeStream(FileInputStream(file), null, options)
+
         bitmap?.let {
             return Receipt(
                 bitmap,
@@ -43,6 +49,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         }
 
 
+
         return saveFile(
             dir,
             "${(filetype.datetimeToString())}_${filetype.id}.png",
@@ -51,15 +58,17 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
     }
 
     override fun getFromInternalStorage(filepath: String): Receipt {
-        return pathToReceipt(getFile("$dir/$filepath"))
+        return pathToReceipt(getFile(dir, filepath))
     }
 
     fun getAllFromStorage(): List<Receipt> {
-        val directory = File(context.filesDir, dir)
+        val cw = ContextWrapper(context)
+        val directory: File = cw.getDir(dir, Context.MODE_PRIVATE)
         val fileList = directory.listFiles()
         if (fileList != null) {
             return fileList.asSequence().map { pathToReceipt(it) }.toList()
         }
+
         return emptyList()
     }
 }
