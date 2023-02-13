@@ -5,24 +5,41 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.entity.receipt.Receipt
-import java.util.*
+import com.example.rc_app.entity.receipt.receiptList.ReceiptAdapter
 
 class GalleryFragment : Fragment() {
-    private var buffer: Queue<Receipt> = ArrayDeque()
-    private lateinit var repo: GalleryRepository
+
+    lateinit var dataSource: GalleryDataSource
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        repo = GalleryRepository(requireContext())
-        buffer = ArrayDeque(repo.getAllFromStorage())
-        return inflater.inflate(R.layout.fragment_gallery, container, false)
+        dataSource = GalleryDataSource(requireActivity())
+        val view = inflater.inflate(R.layout.fragment_gallery, container, false)
+
+        if (view is RecyclerView) {
+            val recyclerView: RecyclerView = view
+            val receiptAdapter = ReceiptAdapter { receipt: Receipt -> adapterOnClick(receipt) }
+            recyclerView.adapter = receiptAdapter
+
+            dataSource.getReceiptList().observe(viewLifecycleOwner) {
+                it?.let {
+                    receiptAdapter.submitList(it as MutableList<Receipt>)
+                }
+            }
+        }
+
+        return view
     }
 
+    private fun adapterOnClick(receipt: Receipt) {
 
+    }
 
 }
