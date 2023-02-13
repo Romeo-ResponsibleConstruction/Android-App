@@ -11,6 +11,7 @@ class GalleryDataSource(context: Context) {
     private val bufferLiveData = MutableLiveData(repo.getAllFromStorage())
 
     fun addReceipt(receipt: Receipt) {
+        repo.saveToInternalStorage(receipt)
         val currentList = bufferLiveData.value
         if (currentList == null) {
             bufferLiveData.postValue(listOf(receipt))

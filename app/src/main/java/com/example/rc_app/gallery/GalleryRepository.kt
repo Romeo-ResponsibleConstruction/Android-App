@@ -45,6 +45,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         }
 
 
+
         return saveFile(
             dir,
             "${(filetype.datetimeToString())}_${filetype.id}.png",

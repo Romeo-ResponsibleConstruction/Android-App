@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.example.rc_app.databinding.ActivityMainBinding
 import com.example.rc_app.entity.receipt.Receipt
+import com.example.rc_app.gallery.GalleryDataSource
 import com.example.rc_app.gallery.GalleryRepository
 import java.io.File
 
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var galleryRepo: GalleryRepository
+    private lateinit var galleryDataSource: GalleryDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         galleryRepo = GalleryRepository(this.applicationContext)
+        galleryDataSource = GalleryDataSource(this.applicationContext)
 
         val btnCamera: Button = findViewById(R.id.btnOpenCamera)
         btnCamera.setOnClickListener {
@@ -83,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
             val testRecpt = Receipt(BitmapFactory.decodeFile(photoFile.absolutePath))
             Toast.makeText(this, "Saving...", Toast.LENGTH_SHORT).show()
-            galleryRepo.saveToInternalStorage(testRecpt)
+            galleryDataSource.addReceipt(testRecpt)
             Toast.makeText(this, "Photo successfully saved! (hopefully)", Toast.LENGTH_SHORT).show()
 
             val imageView = findViewById<ImageView>(R.id.imageView3)

@@ -1,5 +1,6 @@
 package com.example.rc_app.gallery
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ class GalleryFragment : Fragment() {
 
     lateinit var dataSource: GalleryDataSource
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,12 +29,17 @@ class GalleryFragment : Fragment() {
             val recyclerView: RecyclerView = view
             val receiptAdapter = ReceiptAdapter { receipt: Receipt -> adapterOnClick(receipt) }
             recyclerView.adapter = receiptAdapter
+            recyclerView.layoutManager = GridLayoutManager(context, 2)
+//            recyclerView.isNestedScrollingEnabled = false
 
             dataSource.getReceiptList().observe(viewLifecycleOwner) {
                 it?.let {
-                    receiptAdapter.submitList(it as MutableList<Receipt>)
+                    if (!it.isEmpty()) {
+                        receiptAdapter.submitList(it as MutableList<Receipt>)
+                    }
                 }
             }
+
         }
 
         return view
