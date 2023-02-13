@@ -30,7 +30,7 @@ class GalleryFragment : Fragment() {
             val receiptAdapter = ReceiptAdapter { receipt: Receipt -> adapterOnClick(receipt) }
             recyclerView.adapter = receiptAdapter
             recyclerView.layoutManager = GridLayoutManager(context, 2)
-//            recyclerView.isNestedScrollingEnabled = false
+            recyclerView.isNestedScrollingEnabled = false
 
             dataSource.getReceiptList().observe(viewLifecycleOwner) {
                 it?.let {
