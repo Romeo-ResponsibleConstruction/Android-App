@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.layout.header.CameraHeaderAdapter
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.layout.receiptList.ReceiptAdapter
+import com.example.rc_app.layout.receipt.ReceiptAdapter
 import java.io.File
 
 
