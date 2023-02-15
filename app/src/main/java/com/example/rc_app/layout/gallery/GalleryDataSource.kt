@@ -1,4 +1,4 @@
-package com.example.rc_app.components.gallery
+package com.example.rc_app.layout.gallery
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -11,7 +11,7 @@ class GalleryDataSource(context: Context) {
     private val bufferLiveData = MutableLiveData(repo.getAllFromStorage())
 
     fun addReceipt(receipt: Receipt) {
-        repo.create(receipt)
+        repo.save(receipt)
         val currentList = bufferLiveData.value
         if (currentList == null) {
             bufferLiveData.postValue(listOf(receipt))

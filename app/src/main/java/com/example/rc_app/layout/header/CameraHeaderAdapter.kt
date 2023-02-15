@@ -1,4 +1,4 @@
-package com.example.rc_app.components.header
+package com.example.rc_app.layout.header
 
 import android.content.Intent
 import android.provider.MediaStore

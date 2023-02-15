@@ -4,25 +4,25 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.example.rc_app.infrastructure.GeneralFileRepository
-import com.example.rc_app.infrastructure.Repository
+import com.example.rc_app.storage.FileStorageRepository
+import com.example.rc_app.storage.InternalFileStorageRepository
+import com.example.rc_app.storage.Repository
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceiptRepository(val context: Context, val repository: Repository<Receipt>) : GeneralFileRepository<Receipt>(context), {
+class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
 
     private val dir = "imageDir"
+    private val fileStorageUtility: FileStorageRepository<Receipt> = InternalFileStorageRepository(context)
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name
         val (cal: String, uuid, _) = tailPath.split("_", ".")
 
-        val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
-        val date: Date? = df.parse(cal)
+        val date: Date? = SimpleDateFormat("yyyy-MM-dd", Locale.UK).parse(cal)
         date ?: throw IllegalStateException("date is null")
         val calendar = GregorianCalendar()
         calendar.time = date
@@ -36,17 +36,14 @@ class ReceiptRepository(val context: Context, val repository: Repository<Receipt
             calendar,
             UUID.fromString(uuid)
         )
-
     }
 
-    override fun create(filetype: Receipt): String {
+    override fun save(filetype: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
             filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
 
-
-
-        return saveFile(
+        return fileStorageUtility.saveFile (
             dir,
             "${(filetype.datetimeToString())}_${filetype.id}.png",
             compress
@@ -54,7 +51,7 @@ class ReceiptRepository(val context: Context, val repository: Repository<Receipt
     }
 
     override fun read(filepath: String): Receipt {
-        return pathToReceipt(getFile(dir, filepath))
+        return pathToReceipt(fileStorageUtility.getFile(dir, filepath))
     }
 
     fun getAllFromStorage(): List<Receipt> {
@@ -66,5 +63,9 @@ class ReceiptRepository(val context: Context, val repository: Repository<Receipt
         }
 
         return emptyList()
+    }
+
+    override fun delete(filepath: String): Boolean {
+        return fileStorageUtility.deleteFile(filepath)
     }
 }

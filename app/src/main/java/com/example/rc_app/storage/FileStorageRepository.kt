@@ -1,4 +1,4 @@
-package com.example.rc_app.infrastructure
+package com.example.rc_app.storage
 
 import java.io.File
 import java.io.FileOutputStream
