@@ -69,7 +69,7 @@ class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
         return emptyList()
     }
 
-    fun receiptToFilename(receipt: Receipt): String {
+    private fun receiptToFilename(receipt: Receipt): String {
         return "${(receipt.datetimeToString())}_${receipt.id}.png"
     }
 }
