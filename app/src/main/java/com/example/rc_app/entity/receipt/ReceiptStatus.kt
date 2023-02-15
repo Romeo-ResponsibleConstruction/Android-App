@@ -1,6 +1,6 @@
 package com.example.rc_app.entity.receipt
 
-enum class Status {
+enum class ReceiptStatus {
     PENDING,
     UPLOADED,
     ERROR

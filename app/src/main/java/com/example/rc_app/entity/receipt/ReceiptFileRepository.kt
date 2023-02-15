@@ -38,20 +38,24 @@ class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
         )
     }
 
-    override fun save(filetype: Receipt): String {
+    override fun save(entity: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
-            filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            entity.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
 
         return fileStorageUtility.saveFile (
             dir,
-            "${(filetype.datetimeToString())}_${filetype.id}.png",
+            "${receiptToFilename(entity)}.png",
             compress
         )
     }
 
     override fun read(filepath: String): Receipt {
         return pathToReceipt(fileStorageUtility.getFile(dir, filepath))
+    }
+
+    override fun delete(filepath: String): Boolean {
+        return fileStorageUtility.deleteFile(filepath)
     }
 
     fun getAllFromStorage(): List<Receipt> {
@@ -65,7 +69,7 @@ class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
         return emptyList()
     }
 
-    override fun delete(filepath: String): Boolean {
-        return fileStorageUtility.deleteFile(filepath)
+    fun receiptToFilename(receipt: Receipt): String {
+        return "${(receipt.datetimeToString())}_${receipt.id}.png"
     }
 }
