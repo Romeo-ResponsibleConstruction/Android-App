@@ -1,4 +1,4 @@
-package com.example.rc_app.components.gallery
+package com.example.rc_app.layout.gallery
 
 import android.app.Activity
 import android.content.Intent
@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
-import com.example.rc_app.components.header.CameraHeaderAdapter
+import com.example.rc_app.layout.header.CameraHeaderAdapter
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.entity.receipt.receiptList.ReceiptAdapter
+import com.example.rc_app.layout.receiptList.ReceiptAdapter
 import java.io.File
 
 

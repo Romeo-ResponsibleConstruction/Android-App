@@ -24,7 +24,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragmentContainerView2"
-            android:name="com.example.rc_app.components.gallery.GalleryFragment"
+            android:name="com.example.rc_app.layout.gallery.GalleryFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

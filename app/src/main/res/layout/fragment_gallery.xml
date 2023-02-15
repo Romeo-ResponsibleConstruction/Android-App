@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".components.gallery.GalleryFragment">
+    tools:context=".layout.gallery.GalleryFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gallery_recycler_view"
