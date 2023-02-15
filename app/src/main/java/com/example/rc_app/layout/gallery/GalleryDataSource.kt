@@ -7,7 +7,7 @@ import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.entity.receipt.ReceiptFileRepository
 
 class GalleryDataSource(context: Context) {
-    private val repo: ReceiptFileRepository = ReceiptFileRepository(context, )
+    private val repo: ReceiptFileRepository = ReceiptFileRepository(context)
     private val bufferLiveData = MutableLiveData(repo.getAllFromStorage())
 
     fun addReceipt(receipt: Receipt) {

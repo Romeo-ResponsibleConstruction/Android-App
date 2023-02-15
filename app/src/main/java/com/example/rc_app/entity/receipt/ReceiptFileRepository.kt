@@ -45,7 +45,7 @@ class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
 
         return fileStorageUtility.saveFile (
             dir,
-            "${receiptToFilename(entity)}.png",
+            receiptToFilename(entity),
             compress
         )
     }
@@ -54,8 +54,8 @@ class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
         return pathToReceipt(fileStorageUtility.getFile(dir, filepath))
     }
 
-    override fun delete(filepath: String): Boolean {
-        return fileStorageUtility.deleteFile(filepath)
+    override fun delete(entity: Receipt): Boolean {
+        return fileStorageUtility.deleteFile(dir, receiptToFilename(entity))
     }
 
     fun getAllFromStorage(): List<Receipt> {

@@ -35,10 +35,10 @@ class InternalFileStorageRepository<T>(private val context: Context) : FileStora
         return File(directory, filename)
     }
 
-    override fun deleteFile(filepath: String): Boolean {
+    override fun deleteFile(parentdir: String, filename: String): Boolean {
         val cw = ContextWrapper(context)
-        val directory: File = cw.getDir(filepath, Context.MODE_PRIVATE)
-        val file = File(directory, filepath)
+        val directory: File = cw.getDir(parentdir, Context.MODE_PRIVATE)
+        val file = File(directory, filename)
         return file.delete()
     }
 }
