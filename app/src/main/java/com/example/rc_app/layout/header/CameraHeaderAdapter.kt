@@ -1,25 +1,17 @@
 package com.example.rc_app.components.header
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
-import com.example.rc_app.components.gallery.GalleryRepository
 import com.example.rc_app.entity.receipt.Receipt
 import java.io.File
 

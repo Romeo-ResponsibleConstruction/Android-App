@@ -1,4 +1,4 @@
-package com.example.rc_app.entity.receipt.receiptList
+package com.example.rc_app.components.receiptList
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

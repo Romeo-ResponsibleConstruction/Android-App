@@ -1,12 +1,11 @@
-package com.example.rc_app.components.gallery
+package com.example.rc_app.entity.receipt
 
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.storage.GeneralFileRepository
-import com.example.rc_app.storage.InternalRepository
+import com.example.rc_app.infrastructure.GeneralFileRepository
+import com.example.rc_app.infrastructure.Repository
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -14,14 +13,13 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(context),
-    InternalRepository<Receipt> {
+class ReceiptRepository(val context: Context, val repository: Repository<Receipt>) : GeneralFileRepository<Receipt>(context), {
 
     private val dir = "imageDir"
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name
-        val (cal: String, uuid, _) = tailPath.split("_",".")
+        val (cal: String, uuid, _) = tailPath.split("_", ".")
 
         val df: DateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
         val date: Date? = df.parse(cal)
@@ -33,17 +31,15 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         options.inPreferredConfig = Bitmap.Config.RGB_565
         val bitmap = BitmapFactory.decodeStream(FileInputStream(file), null, options)
 
-        bitmap?.let {
-            return Receipt(
-                bitmap,
-                calendar,
-                UUID.fromString(uuid)
-            )
-        }
-        throw IllegalStateException("bitmap is null")
+        return Receipt(
+            bitmap ?: throw IllegalStateException("bitmap is null"),
+            calendar,
+            UUID.fromString(uuid)
+        )
+
     }
 
-    override fun saveToInternalStorage(filetype: Receipt): String {
+    override fun create(filetype: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
             filetype.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
@@ -57,7 +53,7 @@ class GalleryRepository(val context: Context) : GeneralFileRepository<Receipt>(c
         )
     }
 
-    override fun getFromInternalStorage(filepath: String): Receipt {
+    override fun read(filepath: String): Receipt {
         return pathToReceipt(getFile(dir, filepath))
     }
 
