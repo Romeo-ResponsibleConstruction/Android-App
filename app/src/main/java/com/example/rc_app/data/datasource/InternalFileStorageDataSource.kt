@@ -1,4 +1,4 @@
-package com.example.rc_app.storage
+package com.example.rc_app.data.datasource
 
 import android.content.Context
 import android.content.ContextWrapper
@@ -7,7 +7,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 
-class InternalFileStorageRepository<T>(private val context: Context) : FileStorageRepository<T> {
+class InternalFileStorageDataSource<T>(private val context: Context) : FileStorageDataSource<T> {
     override fun saveFile(
         parentdir: String,
         filename: String,

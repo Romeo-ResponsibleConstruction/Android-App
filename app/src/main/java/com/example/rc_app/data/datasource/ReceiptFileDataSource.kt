@@ -1,22 +1,20 @@
-package com.example.rc_app.entity.receipt
+package com.example.rc_app.data.datasource
 
 import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.example.rc_app.storage.FileStorageRepository
-import com.example.rc_app.storage.InternalFileStorageRepository
-import com.example.rc_app.storage.Repository
+import com.example.rc_app.entity.receipt.Receipt
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceiptFileRepository(val context: Context) : Repository<Receipt> {
+class ReceiptFileDataSource(val context: Context) : DataSource<Receipt> {
 
     private val dir = "imageDir"
-    private val fileStorageUtility: FileStorageRepository<Receipt> = InternalFileStorageRepository(context)
+    private val fileStorageUtility: FileStorageDataSource<Receipt> = InternalFileStorageDataSource(context)
 
     private fun pathToReceipt(file: File): Receipt {
         val tailPath = file.name

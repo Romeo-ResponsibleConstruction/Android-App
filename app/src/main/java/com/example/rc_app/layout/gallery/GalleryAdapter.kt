@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.rc_app.R
 import com.example.rc_app.entity.receipt.Receipt
 
-class ReceiptAdapter(private val onClick: (Receipt) -> Unit) :
+class ReceiptsAdapter(private val onClick: (Receipt) -> Unit) :
     ListAdapter<Receipt, ReceiptViewHolder>(ReceiptDiffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
         val view = LayoutInflater.from(parent.context)
