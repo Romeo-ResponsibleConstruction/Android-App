@@ -1,4 +1,4 @@
-package com.example.rc_app.layout.receipt
+package com.example.rc_app.layout.gallery
 
 import android.view.View
 import android.widget.ImageView
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.entity.receipt.Receipt
 
-class ReceiptViewHolder(itemView: View, val onClick: (Receipt) -> Unit) :
+class GalleryItemViewHolder(itemView: View, val onClick: (Receipt) -> Unit) :
     RecyclerView.ViewHolder(itemView) {
 
     private val receiptTextView: TextView = itemView.findViewById(R.id.receiptMetadata)

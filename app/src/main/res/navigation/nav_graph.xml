@@ -9,4 +9,18 @@
         android:name="com.example.rc_app.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" />
+    <fragment
+        android:id="@+id/galleryFragment"
+        android:name="com.example.rc_app.layout.gallery.GalleryFragment"
+        android:label="fragment_gallery"
+        tools:layout="@layout/fragment_gallery" />
+    <fragment
+        android:id="@+id/landingFragment"
+        android:name="com.example.rc_app.layout.landing.LandingFragment"
+        android:label="fragment_landing"
+        tools:layout="@layout/fragment_landing" >
+        <action
+            android:id="@+id/action_landingFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment" />
+    </fragment>
 </navigation>

@@ -19,6 +19,7 @@
         <entry key="app/src/main/res/layout/header_main.xml" value="0.17378540039062504" />
         <entry key="app/src/main/res/layout/more_info_popup.xml" value="0.22239379882812496" />
         <entry key="app/src/main/res/layout/receipt_item.xml" value="0.29393115942028986" />
+        <entry key="app/src/main/res/layout/receipt_log_item.xml" value="0.36405792236328127" />
         <entry key="app/src/main/res/layout/sample_camera_header_view.xml" value="0.2604166666666667" />
         <entry key="app/src/main/res/layout/sample_receipt_view.xml" value="0.271875" />
       </map>

@@ -6,16 +6,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.rc_app.R
 import com.example.rc_app.entity.receipt.Receipt
+import com.example.rc_app.layout.gallery.GalleryItemViewHolder
 
 class ReceiptsAdapter(private val onClick: (Receipt) -> Unit) :
-    ListAdapter<Receipt, ReceiptViewHolder>(ReceiptDiffCallback) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
+    ListAdapter<Receipt, GalleryItemViewHolder>(ReceiptDiffCallback) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryItemViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.receipt_item, parent, false)
-        return ReceiptViewHolder(view, onClick)
+        return GalleryItemViewHolder(view, onClick)
     }
 
-    override fun onBindViewHolder(holder: ReceiptViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: GalleryItemViewHolder, position: Int) {
         val receipt = getItem(position)
         holder.bind(receipt)
     }

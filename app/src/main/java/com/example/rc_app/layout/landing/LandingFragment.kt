@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.data.repository.GalleryRepository
@@ -22,6 +23,7 @@ import com.example.rc_app.layout.gallery.GalleryViewModel
 import com.example.rc_app.layout.gallery.GalleryViewModelFactory
 import com.example.rc_app.layout.header.CameraHeaderAdapter
 import com.example.rc_app.layout.receipt.ReceiptsAdapter
+import com.example.rc_app.layout.receiptLog.ReceiptLogAdapter
 import com.example.rc_app.service.ReceiptService
 import java.io.File
 
@@ -43,26 +45,20 @@ class LandingFragment : Fragment() {
         photoFile = getPhotoFile(FILE_NAME)
 
         val headerAdapter = CameraHeaderAdapter(this, photoFile)
-        val receiptsAdapter = ReceiptsAdapter { receipt: Receipt -> adapterOnClick(receipt) }
-        val concatAdapter = ConcatAdapter(headerAdapter, receiptsAdapter)
+        val receiptLogAdapter = ReceiptLogAdapter()
+        val concatAdapter = ConcatAdapter(headerAdapter, receiptLogAdapter)
 
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.gallery_recycler_view)
-        val manager = GridLayoutManager(context, 2);
+        val manager = LinearLayoutManager(context);
         recyclerView.layoutManager = manager
-        manager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return if (position == 0) manager.spanCount else 1
-            }
-        }
-
         recyclerView.adapter = concatAdapter
 
         viewModel.receiptsLiveData.observe(viewLifecycleOwner) {
             it?.let {
                 if (it.isNotEmpty()) {
-                    receiptsAdapter.submitList(it as MutableList<Receipt>)
+                    receiptLogAdapter.submitList(it as MutableList<Receipt>)
                     headerAdapter.updateWeekCount(it.size)
                     headerAdapter.updatePendingCount(it.size)
                 }
