@@ -16,7 +16,7 @@ class GalleryViewModelFactory(param: GalleryRepository) :
     ViewModelProvider.Factory {
     private val dataSource: GalleryRepository
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return GalleryViewModel(dataSource) as T
     }
 
