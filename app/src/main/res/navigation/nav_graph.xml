@@ -13,9 +13,5 @@
         android:id="@+id/landingFragment"
         android:name="com.example.rc_app.layout.landing.LandingFragment"
         android:label="fragment_landing"
-        tools:layout="@layout/fragment_landing" >
-        <action
-            android:id="@+id/action_landingFragment_to_galleryFragment"
-            app:destination="@id/galleryFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_landing" />
 </navigation>
