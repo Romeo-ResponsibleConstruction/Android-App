@@ -19,7 +19,6 @@ import com.example.rc_app.layout.receipt.ReceiptsAdapter
 
 class GalleryFragment : Fragment() {
 
-    lateinit var dataSource: GalleryRepository
     private val viewModel: ReceiptsViewModel by activityViewModels()
 
     override fun onCreateView(
