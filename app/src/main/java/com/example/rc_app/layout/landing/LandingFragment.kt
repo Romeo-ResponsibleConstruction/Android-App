@@ -34,17 +34,22 @@ class LandingFragment : Fragment() {
     lateinit var photoFile: File
     lateinit var receiptService: ReceiptService
     private val viewModel: ReceiptsViewModel by activityViewModels{ ReceiptsViewModelFactory(dataSource) }
+    lateinit var headerAdapter: CameraHeaderAdapter
+    private val receiptLogAdapter: ReceiptLogAdapter = ReceiptLogAdapter()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        dataSource = GalleryRepository(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataSource = GalleryRepository(requireContext())
         photoFile = getPhotoFile(FILE_NAME)
 
-        val headerAdapter = CameraHeaderAdapter(this, photoFile)
-        val receiptLogAdapter = ReceiptLogAdapter()
+        headerAdapter = CameraHeaderAdapter(this, photoFile)
         val concatAdapter = ConcatAdapter(headerAdapter, receiptLogAdapter)
 
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
@@ -53,6 +58,13 @@ class LandingFragment : Fragment() {
         val manager = LinearLayoutManager(context);
         recyclerView.layoutManager = manager
         recyclerView.adapter = concatAdapter
+
+        receiptService = ReceiptService(requireContext(), dataSource)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         viewModel.receiptsLiveData.observe(viewLifecycleOwner) {
             it?.let {
@@ -64,9 +76,6 @@ class LandingFragment : Fragment() {
             }
 
         }
-
-        receiptService = ReceiptService(requireContext(), dataSource)
-        return view
     }
 
     private fun adapterOnClick(receipt: Receipt) {

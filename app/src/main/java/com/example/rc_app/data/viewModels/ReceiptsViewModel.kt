@@ -6,6 +6,7 @@ import com.example.rc_app.data.repository.GalleryRepository
 
 class ReceiptsViewModel(dataSource: GalleryRepository) : ViewModel() {
     val receiptsLiveData = dataSource.getReceiptList()
+
 }
 
 class ReceiptsViewModelFactory(param: GalleryRepository) :
