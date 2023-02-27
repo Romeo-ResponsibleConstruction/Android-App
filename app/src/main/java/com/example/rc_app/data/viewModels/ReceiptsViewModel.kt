@@ -1,23 +1,19 @@
-package com.example.rc_app.layout.gallery
+package com.example.rc_app.data.viewModels
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.rc_app.data.repository.GalleryRepository
-import com.example.rc_app.entity.receipt.Receipt
 
-class GalleryViewModel(dataSource: GalleryRepository) : ViewModel() {
+class ReceiptsViewModel(dataSource: GalleryRepository) : ViewModel() {
     val receiptsLiveData = dataSource.getReceiptList()
-
-
 }
 
-class GalleryViewModelFactory(param: GalleryRepository) :
+class ReceiptsViewModelFactory(param: GalleryRepository) :
     ViewModelProvider.Factory {
     private val dataSource: GalleryRepository
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GalleryViewModel(dataSource) as T
+        return ReceiptsViewModel(dataSource) as T
     }
 
     init {

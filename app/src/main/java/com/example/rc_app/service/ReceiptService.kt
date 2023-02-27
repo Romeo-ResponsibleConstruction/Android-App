@@ -52,15 +52,15 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
     private fun sendToBucket(receipt: Receipt): Boolean {
         // todo: call api here
         val success = true
-        Log.d("api", "sending")
-
-        if (success) {
-            dataSource.removeReceipt(receipt)
-            Log.d("api", "sent!")
-
-        } else {
-            Log.e("api", "failed to upload receipt")
-        }
+//        Log.d("api", "sending")
+//
+//        if (success) {
+//            dataSource.removeReceipt(receipt)
+//            Log.d("api", "sent!")
+//
+//        } else {
+//            Log.e("api", "failed to upload receipt")
+//        }
         return success
     }
 }

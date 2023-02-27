@@ -11,18 +11,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.data.repository.GalleryRepository
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.layout.gallery.GalleryViewModel
-import com.example.rc_app.layout.gallery.GalleryViewModelFactory
+import com.example.rc_app.data.viewModels.ReceiptsViewModel
+import com.example.rc_app.data.viewModels.ReceiptsViewModelFactory
 import com.example.rc_app.layout.header.CameraHeaderAdapter
-import com.example.rc_app.layout.receipt.ReceiptsAdapter
 import com.example.rc_app.layout.receiptLog.ReceiptLogAdapter
 import com.example.rc_app.service.ReceiptService
 import java.io.File
@@ -34,14 +33,14 @@ class LandingFragment : Fragment() {
     lateinit var dataSource: GalleryRepository
     lateinit var photoFile: File
     lateinit var receiptService: ReceiptService
-    private val viewModel: GalleryViewModel by viewModels{ GalleryViewModelFactory(dataSource) }
+    private val viewModel: ReceiptsViewModel by activityViewModels{ ReceiptsViewModelFactory(dataSource) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        dataSource = GalleryRepository(requireActivity())
+        dataSource = GalleryRepository(requireContext())
         photoFile = getPhotoFile(FILE_NAME)
 
         val headerAdapter = CameraHeaderAdapter(this, photoFile)
