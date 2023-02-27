@@ -39,12 +39,16 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        resources.excludes += 'META-INF/INDEX.LIST'
+    }
 
 }
 
 
 
 dependencies {
+    implementation 'com.google.firebase:firebase-common-ktx:20.1.0'
     def nav_version = "2.5.3"
 
 
@@ -64,6 +68,8 @@ dependencies {
     implementation("androidx.navigation:navigation-dynamic-features-fragment:$nav_version")
     androidTestImplementation("androidx.navigation:navigation-testing:$nav_version")
     implementation("androidx.navigation:navigation-compose:$nav_version")
-
-
+    implementation platform('com.google.cloud:libraries-bom:26.8.0')
+    implementation 'com.google.cloud:google-cloud-storage'
+    implementation platform('com.google.firebase:firebase-bom:31.2.2')
+    implementation 'com.google.firebase:firebase-storage-ktx'
 }

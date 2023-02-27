@@ -1,16 +1,21 @@
 package com.example.rc_app.service
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.util.Log
-import com.example.rc_app.entity.receipt.Receipt
+import android.graphics.Bitmap
+import android.net.*
+import android.widget.Toast
 import com.example.rc_app.data.repository.GalleryRepository
+import com.example.rc_app.entity.receipt.Receipt
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
+import java.io.ByteArrayOutputStream
 
 class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val storage = Firebase.storage
+    private val storageRef = storage.reference
 
     init {
         val networkRequest = NetworkRequest.Builder()
@@ -51,16 +56,36 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
 
     private fun sendToBucket(receipt: Receipt): Boolean {
         // todo: call api here
-        val success = true
-//        Log.d("api", "sending")
-//
-//        if (success) {
-//            dataSource.removeReceipt(receipt)
-//            Log.d("api", "sent!")
-//
-//        } else {
-//            Log.e("api", "failed to upload receipt")
-//        }
+        val bos = ByteArrayOutputStream()
+        receipt.image.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+        val bitMapData = bos.toByteArray()
+
+        val metadata = storageMetadata{
+            contentType = "image/jpeg"
+        }
+
+        var success = false
+        var progress = 0.0
+
+        storageRef.child("gpr_buffer/${receipt.idToString()}").putBytes(bitMapData, metadata)
+                  .addOnSuccessListener {
+                        fun successHandler(taskSnapshot:UploadTask.TaskSnapshot){
+                            Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
+                            success = true
+                        }
+                  }
+                  .addOnFailureListener {
+                        fun failureHandler(exception: java.lang.Exception){
+                            Toast.makeText(context, "Failed: "+exception.message, Toast.LENGTH_SHORT).show()
+                            success = false
+                        }
+                  }
+                  .addOnProgressListener {
+                        fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                            progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
+                        }
+                  }
+
         return success
     }
 }
