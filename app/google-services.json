@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "176400109730",
+    "project_id": "ib-group-project-romeo",
+    "storage_bucket": "ib-group-project-romeo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:176400109730:android:0572e52f6cfc2ae8e2c7fb",
+        "android_client_info": {
+          "package_name": "com.example.rc_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "176400109730-0ipk28c3vlfada110rljjv5tm0gbaf7k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLnsAvqm-Js65tf8k4zDnA8JO2yx0wKC4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "176400109730-0ipk28c3vlfada110rljjv5tm0gbaf7k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
