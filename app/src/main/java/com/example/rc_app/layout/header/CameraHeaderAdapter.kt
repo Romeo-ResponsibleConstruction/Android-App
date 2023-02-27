@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
@@ -20,17 +20,20 @@ private const val REQUEST_CODE = 99
 
 class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): RecyclerView.Adapter<CameraHeaderAdapter.HeaderViewHolder>(), View.OnClickListener {
 
-    private var latestReceipt: Receipt? = null
+    private var totalCount: Int = 0
+    private var pendingCount: Int = 0
 
     lateinit var parent: ViewGroup
 
     class HeaderViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        private val latestPhotoView: ImageView = itemView.findViewById(R.id.imageView3)
         val btnOpenCamera: Button = itemView.findViewById(R.id.btnOpenCamera)
+        val totalTaken: TextView = itemView.findViewById(R.id.takenNumView)
+        val pendingNum: TextView = itemView.findViewById(R.id.pendingNumView)
         val view: View = view
 
-        fun bind(latestReceipt: Receipt?) {
-            latestPhotoView.setImageBitmap(latestReceipt?.image)
+        fun bind(numTaken: Int, numPending: Int) {
+            totalTaken.text = numTaken.toString()
+            pendingNum.text = numPending.toString()
         }
     }
 
@@ -42,7 +45,7 @@ class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): Recycler
     }
 
     override fun onBindViewHolder(holder: HeaderViewHolder, position: Int) {
-        holder.bind(latestReceipt)
+        holder.bind(totalCount, pendingCount)
         holder.btnOpenCamera.setOnClickListener(this)
     }
 
@@ -50,8 +53,13 @@ class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): Recycler
         return 1
     }
 
-    fun updateLatestImage(updatedImage: Receipt) {
-        latestReceipt = updatedImage
+    fun updateWeekCount(updatedWeekCount: Int) {
+        totalCount = updatedWeekCount
+        notifyDataSetChanged()
+    }
+
+    fun updatePendingCount(updatedPendingCount: Int) {
+        pendingCount = updatedPendingCount
         notifyDataSetChanged()
     }
 

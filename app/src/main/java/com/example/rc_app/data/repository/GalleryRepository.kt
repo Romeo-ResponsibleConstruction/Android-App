@@ -1,13 +1,14 @@
-package com.example.rc_app.layout.gallery
+package com.example.rc_app.data.repository
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.entity.receipt.ReceiptFileRepository
+import com.example.rc_app.data.datasource.ReceiptFileDataSource
 
-class GalleryDataSource(context: Context) {
-    private val repo: ReceiptFileRepository = ReceiptFileRepository(context)
+class GalleryRepository(val context: Context) {
+    private val repo: ReceiptFileDataSource = ReceiptFileDataSource(context)
     private val bufferLiveData = MutableLiveData(repo.getAllFromStorage())
 
     fun addReceipt(receipt: Receipt) {
@@ -29,9 +30,11 @@ class GalleryDataSource(context: Context) {
     fun removeReceipt(receipt: Receipt) {
         val currentList = bufferLiveData.value
         if (currentList != null) {
+            repo.delete(receipt)
             val updatedList = currentList.toMutableList()
             updatedList.remove(receipt)
             bufferLiveData.postValue(updatedList)
+            Toast.makeText(context, "Sent to api", Toast.LENGTH_SHORT).show()
         }
     }
 
