@@ -13,9 +13,11 @@ import com.google.firebase.storage.ktx.storageMetadata
 import java.io.ByteArrayOutputStream
 
 class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
-    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val storage = Firebase.storage
     private val storageRef = storage.reference
+    private var isConnected = false
 
     init {
         val networkRequest = NetworkRequest.Builder()
@@ -27,10 +29,14 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             // network is available for use
             override fun onAvailable(network: Network) {
+                isConnected = true
                 val receiptList = dataSource.getReceiptList().value
-                if (!receiptList.isNullOrEmpty()) {
+                while (isConnected && !receiptList.isNullOrEmpty()) {
                     val deque = ArrayDeque(receiptList)
-                    sendToBucket(deque.last())
+                    val receiptLast = deque.last()
+                    if (sendToBucket(receiptLast)) {
+                        dataSource.removeReceipt(receiptLast)
+                    }
                 }
                 super.onAvailable(network)
             }
@@ -47,6 +53,7 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
 
             // lost network connection
             override fun onLost(network: Network) {
+                isConnected = false
                 super.onLost(network)
             }
         }
@@ -60,7 +67,7 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         receipt.image.compress(Bitmap.CompressFormat.JPEG, 100, bos)
         val bitMapData = bos.toByteArray()
 
-        val metadata = storageMetadata{
+        val metadata = storageMetadata {
             contentType = "image/jpeg"
         }
 
@@ -68,23 +75,24 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         var progress = 0.0
 
         storageRef.child("gpr_dummy/${receipt.idToString()}").putBytes(bitMapData, metadata)
-                  .addOnSuccessListener {
-                        fun successHandler(taskSnapshot:UploadTask.TaskSnapshot){
-                            Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
-                            success = true
-                        }
-                  }
-                  .addOnFailureListener {
-                        fun failureHandler(exception: java.lang.Exception){
-                            Toast.makeText(context, "Failed: "+exception.message, Toast.LENGTH_SHORT).show()
-                            success = false
-                        }
-                  }
-                  .addOnProgressListener {
-                        fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
-                            progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
-                        }
-                  }
+            .addOnSuccessListener {
+                fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                    Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
+                    success = true
+                }
+            }
+            .addOnFailureListener {
+                fun failureHandler(exception: java.lang.Exception) {
+                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
+                        .show()
+                    success = false
+                }
+            }
+            .addOnProgressListener {
+                fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                    progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
+                }
+            }
 
         return success
     }
