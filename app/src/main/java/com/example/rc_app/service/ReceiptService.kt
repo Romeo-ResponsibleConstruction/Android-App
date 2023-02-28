@@ -12,7 +12,7 @@ import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import java.io.ByteArrayOutputStream
 
-class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
+class ReceiptService(val context: Context, val galleryRepository: GalleryRepository) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val storage = Firebase.storage
@@ -30,12 +30,12 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
             // network is available for use
             override fun onAvailable(network: Network) {
                 isConnected = true
-                val receiptList = dataSource.getReceiptList().value
+                val receiptList = galleryRepository.getReceiptList().value
                 while (isConnected && !receiptList.isNullOrEmpty()) {
                     val deque = ArrayDeque(receiptList)
                     val receiptLast = deque.last()
                     if (sendToBucket(receiptLast)) {
-                        dataSource.removeReceipt(receiptLast)
+                        galleryRepository.removeReceipt(receiptLast)
                     }
                 }
                 super.onAvailable(network)
