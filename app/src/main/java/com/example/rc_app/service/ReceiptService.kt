@@ -39,21 +39,7 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
             // network is available for use
             override fun onAvailable(network: Network) {
                 isConnected = true
-
-                val receiptQueue: Queue<Receipt> = LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
-                while (isConnected && !receiptQueue.isNullOrEmpty()) {
-                    while (!retryTasks.isNullOrEmpty()){
-                        val task = retryTasks.poll()
-                        val uploadTask = sendToBucket(task.first, task.second)
-                        inFlightTasks.add(uploadTask)
-                    }
-                    while (!receiptQueue.isNullOrEmpty()){
-                        val receipt = receiptQueue.poll()
-                        val uploadTask = sendToBucket(receipt)
-                        inFlightTasks.add(uploadTask)
-                        galleryRepository.removeReceipt(receipt)
-                    }
-                }
+                initiateSend()
                 super.onAvailable(network)
             }
 
@@ -77,6 +63,22 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
 
+    fun initiateSend() {
+        val receiptQueue: Queue<Receipt> = LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
+        while (isConnected && !receiptQueue.isNullOrEmpty()) {
+            while (!retryTasks.isNullOrEmpty()){
+                val task = retryTasks.poll()
+                val uploadTask = sendToBucket(task.first, task.second)
+                inFlightTasks.add(uploadTask)
+            }
+            while (!receiptQueue.isNullOrEmpty()){
+                val receipt = receiptQueue.poll()
+                val uploadTask = sendToBucket(receipt)
+                inFlightTasks.add(uploadTask)
+                galleryRepository.removeReceipt(receipt)
+            }
+        }
+    }
 
     private fun sendToBucket(receipt: Receipt, uploadUri: Uri? = null): StorageTask<UploadTask.TaskSnapshot> {
         // todo: call api here

@@ -40,6 +40,7 @@ class LandingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         dataSource = GalleryRepository(requireContext())
+        receiptService = ReceiptService(requireContext(), dataSource)
     }
 
     override fun onCreateView(
@@ -59,7 +60,6 @@ class LandingFragment : Fragment() {
         recyclerView.layoutManager = manager
         recyclerView.adapter = concatAdapter
 
-        receiptService = ReceiptService(requireContext(), dataSource)
         return view
     }
 
@@ -96,6 +96,7 @@ class LandingFragment : Fragment() {
             val testRecpt = Receipt(takenImage)
             Toast.makeText(context, "Saving...", Toast.LENGTH_SHORT).show()
             dataSource.addReceipt(testRecpt)
+            receiptService.initiateSend()
             Toast.makeText(context, "Photo successfully saved! (hopefully)", Toast.LENGTH_SHORT).show()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
