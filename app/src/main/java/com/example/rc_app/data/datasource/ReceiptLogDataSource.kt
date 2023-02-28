@@ -3,6 +3,7 @@ package com.example.rc_app.data.datasource
 import android.content.Context
 import com.example.rc_app.entity.receipt.Receipt
 import com.google.gson.Gson
+import java.io.File
 
 class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
 
@@ -22,9 +23,12 @@ class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
     override fun save(entity: Receipt): String {
         var gson = Gson()
         val file = fileStorageUtility.getFile(parentDir, jsonFile)
-        var jsonString = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
-        jsonString.receipts.add(entity)
-//        return fileStorageUtility.saveFile(parentDir, jsonFile, )
+        var jsonFormat = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
+        jsonFormat.receipts.add(entity)
+        File(jsonFile).writeText(gson.toJson(jsonFormat))
+        return fileStorageUtility.saveFile(parentDir, jsonFile,
+
+        )
         TODO("finish impl")
     }
 
