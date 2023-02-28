@@ -8,7 +8,7 @@ import java.io.File
 class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
 
     private val parentDir = "receiptLogDir"
-    private val jsonFile = "log.json"
+    private val jsonFilename = "log.json"
     private val fileStorageUtility: FileStorageDataSource<Receipt> = InternalFileStorageDataSource(context)
 
     private class JsonFormat(val week_beg: String, val receipts: MutableList<Receipt>) {
@@ -22,12 +22,13 @@ class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
 
     override fun save(entity: Receipt): String {
         val gson = Gson()
-        val file = fileStorageUtility.getFile(parentDir, jsonFile)
+        val file = fileStorageUtility.getFile(parentDir, jsonFilename)
         val jsonFormat = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
         jsonFormat.receipts.add(entity)
-        File(jsonFile).writeText(gson.toJson(jsonFormat))
-//        return fileStorageUtility.saveFile(parentDir, jsonFile,
-//        )
+        val fos = File(jsonFilename).writeText(gson.toJson(jsonFormat))
+        return fileStorageUtility.saveFile(parentDir, jsonFilename,
+            json
+        )
         TODO("finish impl")
     }
 
