@@ -13,7 +13,7 @@ class GalleryRepository(val context: Context) {
     private val bufferLiveData = MutableLiveData(fileDataSource.getAllFromStorage())
 
     fun getFileFromReceipt(receipt: Receipt): File {
-        return repo.getFileFromReceipt(receipt)
+        return fileDataSource.getFileFromReceipt(receipt)
     }
 
     fun addReceipt(receipt: Receipt) {
