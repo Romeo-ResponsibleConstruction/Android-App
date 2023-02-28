@@ -96,6 +96,7 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
             fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
                 Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
                 inFlightTasks.remove(uploadTask)
+                galleryRepository.removeReceipt(receipt)
             }
         }
         .addOnFailureListener {
