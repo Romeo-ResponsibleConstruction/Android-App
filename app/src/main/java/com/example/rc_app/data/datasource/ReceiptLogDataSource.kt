@@ -21,14 +21,13 @@ class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
     }
 
     override fun save(entity: Receipt): String {
-        var gson = Gson()
+        val gson = Gson()
         val file = fileStorageUtility.getFile(parentDir, jsonFile)
-        var jsonFormat = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
+        val jsonFormat = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
         jsonFormat.receipts.add(entity)
         File(jsonFile).writeText(gson.toJson(jsonFormat))
-        return fileStorageUtility.saveFile(parentDir, jsonFile,
-
-        )
+//        return fileStorageUtility.saveFile(parentDir, jsonFile,
+//        )
         TODO("finish impl")
     }
 
@@ -40,5 +39,9 @@ class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
         TODO("Not yet implemented")
     }
 
+    fun onAppStart() {
+        TODO("on app start, check if same week. if different week then filter out accepted receipts")
+
+    }
 
 }

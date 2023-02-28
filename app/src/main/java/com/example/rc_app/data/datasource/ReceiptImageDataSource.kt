@@ -57,7 +57,7 @@ class ReceiptImageDataSource(val context: Context) : DataSource<Receipt> {
     override fun delete(entity: Receipt): Boolean {
         return fileStorageUtility.deleteFile(dir, receiptToFilename(entity))
     }
-
+    
     fun getAllFromStorage(): List<Receipt> {
         val cw = ContextWrapper(context)
         val directory: File = cw.getDir(dir, Context.MODE_PRIVATE)
