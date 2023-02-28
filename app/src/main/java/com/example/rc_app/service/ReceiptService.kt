@@ -105,20 +105,20 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
                 inFlightTasks.remove(uploadTask)
             }
         }
-        .addOnFailureListener {
-            fun failureHandler(exception: java.lang.Exception) {
-                Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
-                    .show()
-                val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
-                retryTasks.add(Pair(receipt,uploadSessionURI))
-                inFlightTasks.remove(uploadTask)
+            .addOnFailureListener {
+                fun failureHandler(exception: java.lang.Exception) {
+                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
+                        .show()
+                    val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
+                    retryTasks.add(Pair(receipt,uploadSessionURI))
+                    inFlightTasks.remove(uploadTask)
+                }
             }
-        }
-        .addOnProgressListener {
-            fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
-                println(100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount))
+            .addOnProgressListener {
+                fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                    println(100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount))
+                }
             }
-        }
 
         return uploadTask
     }
