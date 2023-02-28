@@ -4,13 +4,18 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.*
 import android.widget.Toast
+import androidx.core.net.toUri
+import com.example.rc_app.data.datasource.ReceiptFileDataSource
 import com.example.rc_app.data.repository.GalleryRepository
 import com.example.rc_app.entity.receipt.Receipt
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.ktx.storageMetadata
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 class ReceiptService(val context: Context, val galleryRepository: GalleryRepository) {
     private val connectivityManager =
@@ -18,6 +23,8 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
     private val storage = Firebase.storage
     private val storageRef = storage.reference
     private var isConnected = false
+    private var inFlightTasks: HashSet<StorageTask<UploadTask.TaskSnapshot>> = HashSet()
+    private var retryTasks: HashSet<Pair<Receipt, Uri?>> = HashSet()
 
     init {
         val networkRequest = NetworkRequest.Builder()
@@ -30,12 +37,16 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
             // network is available for use
             override fun onAvailable(network: Network) {
                 isConnected = true
-                val receiptList = galleryRepository.getReceiptList().value
-                while (isConnected && !receiptList.isNullOrEmpty()) {
-                    val deque = ArrayDeque(receiptList)
-                    val receiptLast = deque.last()
-                    if (sendToBucket(receiptLast)) {
-                        galleryRepository.removeReceipt(receiptLast)
+
+                val receiptQueue = galleryRepository.getReceiptList().value
+                while (isConnected && !receiptQueue.isNullOrEmpty()) {
+                    for (task in retryTasks){
+                        val uploadTask = sendToBucket(task.first, task.second)
+                        inFlightTasks.add(uploadTask)
+                    }
+                    for (receipt in receiptQueue){
+                        val uploadTask = sendToBucket(receipt)
+                        inFlightTasks.add(uploadTask)
                     }
                 }
                 super.onAvailable(network)
@@ -61,39 +72,47 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
 
-    private fun sendToBucket(receipt: Receipt): Boolean {
+
+    private fun sendToBucket(receipt: Receipt, uploadUri: Uri? = null): StorageTask<UploadTask.TaskSnapshot> {
         // todo: call api here
-        val bos = ByteArrayOutputStream()
-        receipt.image.compress(Bitmap.CompressFormat.JPEG, 100, bos)
-        val bitMapData = bos.toByteArray()
+
+        val file = galleryRepository.getFileFromReceipt(receipt)
+        val uri = file.toUri()
 
         val metadata = storageMetadata {
             contentType = "image/jpeg"
         }
 
-        var success = false
         var progress = 0.0
 
-        storageRef.child("gpr_dummy/${receipt.idToString()}").putBytes(bitMapData, metadata)
-            .addOnSuccessListener {
-                fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
-                    Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
-                    success = true
-                }
-            }
-            .addOnFailureListener {
-                fun failureHandler(exception: java.lang.Exception) {
-                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
-                        .show()
-                    success = false
-                }
-            }
-            .addOnProgressListener {
-                fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
-                    progress = 100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
-                }
-            }
 
-        return success
+        var uploadTask = if (uploadUri != null){
+            storageRef.child("gpr_dummy/${receipt.idToString()}").putFile(uri, metadata, uploadUri)
+        } else {
+            storageRef.child("gpr_dummy/${receipt.idToString()}").putFile(uri, metadata)
+        }
+
+        uploadTask.addOnSuccessListener {
+            fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
+                inFlightTasks.remove(uploadTask)
+            }
+        }
+        .addOnFailureListener {
+            fun failureHandler(exception: java.lang.Exception) {
+                Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
+                    .show()
+                val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
+                retryTasks.add(Pair(receipt,uploadSessionURI))
+                inFlightTasks.remove(uploadTask)
+            }
+        }
+        .addOnProgressListener {
+            fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                println(100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount))
+            }
+        }
+
+        return uploadTask
     }
 }

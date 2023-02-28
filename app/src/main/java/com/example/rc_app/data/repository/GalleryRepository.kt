@@ -6,10 +6,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.data.datasource.ReceiptFileDataSource
+import java.io.File
 
 class GalleryRepository(val context: Context) {
     private val fileDataSource: ReceiptFileDataSource = ReceiptFileDataSource(context)
     private val bufferLiveData = MutableLiveData(fileDataSource.getAllFromStorage())
+
+    fun getFileFromReceipt(receipt: Receipt): File {
+        return repo.getFileFromReceipt(receipt)
+    }
 
     fun addReceipt(receipt: Receipt) {
         fileDataSource.save(receipt)
