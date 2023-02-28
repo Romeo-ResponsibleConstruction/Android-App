@@ -67,7 +67,7 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         var success = false
         var progress = 0.0
 
-        storageRef.child("gpr_buffer/${receipt.idToString()}").putBytes(bitMapData, metadata)
+        storageRef.child("gpr_dummy/${receipt.idToString()}").putBytes(bitMapData, metadata)
                   .addOnSuccessListener {
                         fun successHandler(taskSnapshot:UploadTask.TaskSnapshot){
                             Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
