@@ -1,16 +1,32 @@
 package com.example.rc_app.service
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.util.Log
-import com.example.rc_app.entity.receipt.Receipt
+import android.graphics.Bitmap
+import android.net.*
+import android.widget.Toast
+import androidx.core.net.toUri
+import com.example.rc_app.data.datasource.ReceiptFileDataSource
 import com.example.rc_app.data.repository.GalleryRepository
+import com.example.rc_app.entity.receipt.Receipt
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageTask
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
+import com.google.firebase.storage.ktx.storageMetadata
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
+import kotlin.collections.HashSet
 
-class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
-    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+class ReceiptService(val context: Context, val galleryRepository: GalleryRepository) {
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val storage = Firebase.storage
+    private val storageRef = storage.reference
+    private var isConnected = false
+    private var inFlightTasks: HashSet<StorageTask<UploadTask.TaskSnapshot>> = HashSet()
+    private var retryTasks: Queue<Pair<Receipt, Uri?>> = LinkedList()
 
     init {
         val networkRequest = NetworkRequest.Builder()
@@ -22,11 +38,8 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             // network is available for use
             override fun onAvailable(network: Network) {
-                val receiptList = dataSource.getReceiptList().value
-                if (!receiptList.isNullOrEmpty()) {
-                    val deque = ArrayDeque(receiptList)
-                    sendToBucket(deque.last())
-                }
+                isConnected = true
+                initiateSend()
                 super.onAvailable(network)
             }
 
@@ -42,6 +55,7 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
 
             // lost network connection
             override fun onLost(network: Network) {
+                isConnected = false
                 super.onLost(network)
             }
         }
@@ -49,18 +63,65 @@ class ReceiptService(val context: Context, val dataSource: GalleryRepository) {
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
 
-    private fun sendToBucket(receipt: Receipt): Boolean {
+    fun initiateSend() {
+        val receiptQueue: Queue<Receipt> = LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
+        while (isConnected && !receiptQueue.isNullOrEmpty()) {
+            while (!retryTasks.isNullOrEmpty()){
+                val task = retryTasks.poll()
+                val uploadTask = sendToBucket(task.first, task.second)
+                inFlightTasks.add(uploadTask)
+            }
+            while (!receiptQueue.isNullOrEmpty()){
+                val receipt = receiptQueue.poll()
+                val uploadTask = sendToBucket(receipt)
+                inFlightTasks.add(uploadTask)
+                galleryRepository.removeReceipt(receipt)
+            }
+        }
+    }
+
+    private fun sendToBucket(receipt: Receipt, uploadUri: Uri? = null): StorageTask<UploadTask.TaskSnapshot> {
         // todo: call api here
-        val success = true
-//        Log.d("api", "sending")
-//
-//        if (success) {
-//            dataSource.removeReceipt(receipt)
-//            Log.d("api", "sent!")
-//
-//        } else {
-//            Log.e("api", "failed to upload receipt")
-//        }
-        return success
+
+        val file = galleryRepository.getFileFromReceipt(receipt)
+        val uri = file.toUri()
+
+        val metadata = storageMetadata {
+            contentType = "image/jpeg"
+        }
+
+        var progress = 0.0
+
+
+        var uploadTask = if (uploadUri != null){
+            storageRef.child(receipt.idToString()).putFile(uri, metadata, uploadUri)
+        } else {
+            storageRef.child(receipt.idToString()).putFile(uri, metadata)
+        }
+        println(storageRef.path)
+
+
+        uploadTask.addOnSuccessListener {
+            fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
+                inFlightTasks.remove(uploadTask)
+            }
+        }
+            .addOnFailureListener {
+                fun failureHandler(exception: java.lang.Exception) {
+                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
+                        .show()
+                    val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
+                    retryTasks.add(Pair(receipt,uploadSessionURI))
+                    inFlightTasks.remove(uploadTask)
+                }
+            }
+            .addOnProgressListener {
+                fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+                    println(100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount))
+                }
+            }
+
+        return uploadTask
     }
 }
