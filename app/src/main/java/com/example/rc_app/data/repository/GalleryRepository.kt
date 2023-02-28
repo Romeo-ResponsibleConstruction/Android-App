@@ -5,10 +5,10 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.data.datasource.ReceiptFileDataSource
+import com.example.rc_app.data.datasource.ReceiptImageDataSource
 
 class GalleryRepository(val context: Context) {
-    private val repo: ReceiptFileDataSource = ReceiptFileDataSource(context)
+    private val repo: ReceiptImageDataSource = ReceiptImageDataSource(context)
     private val bufferLiveData = MutableLiveData(repo.getAllFromStorage())
 
     fun addReceipt(receipt: Receipt) {

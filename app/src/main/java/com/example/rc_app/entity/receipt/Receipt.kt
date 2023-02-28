@@ -4,12 +4,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Receipt (
-    val image: Bitmap,
-    val calendar: GregorianCalendar = GregorianCalendar(),
+    val image: Bitmap?,
+    val status: ReceiptStatus = ReceiptStatus.PENDING,
+    val dateCreated: GregorianCalendar = GregorianCalendar(),
     val id: UUID = UUID.randomUUID()
 ) {
     fun datetimeToString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.UK).format(calendar.time)
+        return SimpleDateFormat("yyyy-MM-dd", Locale.UK).format(dateCreated.time)
     }
 
     fun idToString(): String {

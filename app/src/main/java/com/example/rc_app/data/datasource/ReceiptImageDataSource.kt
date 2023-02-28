@@ -5,13 +5,14 @@ import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.example.rc_app.entity.receipt.Receipt
+import com.example.rc_app.entity.receipt.ReceiptStatus
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ReceiptFileDataSource(val context: Context) : DataSource<Receipt> {
+class ReceiptImageDataSource(val context: Context) : DataSource<Receipt> {
 
     private val dir = "imageDir"
     private val fileStorageUtility: FileStorageDataSource<Receipt> = InternalFileStorageDataSource(context)
@@ -31,6 +32,7 @@ class ReceiptFileDataSource(val context: Context) : DataSource<Receipt> {
 
         return Receipt(
             bitmap ?: throw IllegalStateException("bitmap is null"),
+            ReceiptStatus.PENDING,
             calendar,
             UUID.fromString(uuid)
         )
@@ -38,7 +40,7 @@ class ReceiptFileDataSource(val context: Context) : DataSource<Receipt> {
 
     override fun save(entity: Receipt): String {
         val compress: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
-            entity.image.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            entity.image!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
 
         return fileStorageUtility.saveFile (
