@@ -72,4 +72,8 @@ class ReceiptImageDataSource(val context: Context) : DataSource<Receipt> {
     private fun receiptToFilename(receipt: Receipt): String {
         return "${(receipt.datetimeToString())}_${receipt.id}.png"
     }
+
+    fun getFileFromReceipt(receipt: Receipt): File {
+        return fileStorageUtility.getFile(dir, receiptToFilename(receipt))
+    }
 }
