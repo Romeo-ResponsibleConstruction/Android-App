@@ -4,12 +4,14 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.rc_app.data.datasource.ReceiptImageDataSource
+import com.example.rc_app.data.datasource.ReceiptLogDataSource
 import com.example.rc_app.entity.receipt.Receipt
-import com.example.rc_app.data.datasource.ReceiptFileDataSource
 import java.io.File
 
 class GalleryRepository(val context: Context) {
-    private val fileDataSource: ReceiptFileDataSource = ReceiptFileDataSource(context)
+    private val fileDataSource: ReceiptImageDataSource = ReceiptImageDataSource(context)
+    private val logDataSource: ReceiptLogDataSource = ReceiptLogDataSource(context)
     private val bufferLiveData = MutableLiveData(fileDataSource.getAllFromStorage())
 
     fun getFileFromReceipt(receipt: Receipt): File {
@@ -18,6 +20,7 @@ class GalleryRepository(val context: Context) {
 
     fun addReceipt(receipt: Receipt) {
         fileDataSource.save(receipt)
+        logDataSource.save(receipt)
         val currentList = bufferLiveData.value
         if (currentList == null) {
             bufferLiveData.postValue(listOf(receipt))

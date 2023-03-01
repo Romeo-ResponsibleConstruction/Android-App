@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -30,17 +29,17 @@ private const val FILE_NAME = "photo"
 private const val REQUEST_CODE = 99
 
 class LandingFragment : Fragment() {
-    lateinit var dataSource: GalleryRepository
-    lateinit var photoFile: File
-    lateinit var receiptService: ReceiptService
-    private val viewModel: ReceiptsViewModel by activityViewModels{ ReceiptsViewModelFactory(dataSource) }
+    private lateinit var galleryRepository: GalleryRepository
+    private lateinit var photoFile: File
+    private lateinit var receiptService: ReceiptService
+    private val viewModel: ReceiptsViewModel by activityViewModels{ ReceiptsViewModelFactory(galleryRepository) }
     lateinit var headerAdapter: CameraHeaderAdapter
     private val receiptLogAdapter: ReceiptLogAdapter = ReceiptLogAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataSource = GalleryRepository(requireContext())
-        receiptService = ReceiptService(requireContext(), dataSource)
+        galleryRepository = GalleryRepository(requireContext())
+        receiptService = ReceiptService(requireContext(), galleryRepository)
     }
 
     override fun onCreateView(
@@ -51,14 +50,14 @@ class LandingFragment : Fragment() {
         photoFile = getPhotoFile(FILE_NAME)
 
         headerAdapter = CameraHeaderAdapter(this, photoFile)
-        val concatAdapter = ConcatAdapter(headerAdapter, receiptLogAdapter)
+//        val concatAdapter = ConcatAdapter(headerAdapter, receiptLogAdapter)
 
         val view = inflater.inflate(R.layout.fragment_gallery, container, false)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.gallery_recycler_view)
         val manager = LinearLayoutManager(context);
         recyclerView.layoutManager = manager
-        recyclerView.adapter = concatAdapter
+        recyclerView.adapter = headerAdapter
 
         return view
     }
@@ -95,7 +94,7 @@ class LandingFragment : Fragment() {
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath, options)
             val testRecpt = Receipt(takenImage)
             Toast.makeText(context, "Saving...", Toast.LENGTH_SHORT).show()
-            dataSource.addReceipt(testRecpt)
+            viewModel.addReceipt(testRecpt)
             receiptService.initiateSend()
             Toast.makeText(context, "Photo successfully saved! (hopefully)", Toast.LENGTH_SHORT).show()
         } else {
