@@ -2,8 +2,10 @@ package com.example.rc_app.data.datasource
 
 import android.content.Context
 import com.example.rc_app.entity.receipt.Receipt
+import com.google.api.client.json.Json
 import com.google.gson.Gson
 import java.io.File
+import java.io.FileOutputStream
 
 class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
 
@@ -21,15 +23,24 @@ class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
     }
 
     override fun save(entity: Receipt): String {
+//        create a gson object
         val gson = Gson()
-        val file = fileStorageUtility.getFile(parentDir, jsonFilename)
-        val jsonFormat = gson.fromJson(file.inputStream().readBytes().toString(), JsonFormat::class.java)
-        jsonFormat.receipts.add(entity)
-        val fos = File(jsonFilename).writeText(gson.toJson(jsonFormat))
+        val initialFile = fileStorageUtility.getFile(parentDir, jsonFilename)
+        var jsonFormat: JsonFormat
+        if (initialFile.exists()) {
+            jsonFormat = gson.fromJson(initialFile.inputStream().readBytes().toString(), JsonFormat::class.java)
+            jsonFormat.receipts.add(entity)
+        } else {
+            jsonFormat = JsonFormat(entity.datetimeToString(), mutableListOf(entity))
+        }
+
+        val writer: (FileOutputStream) -> Unit = {fos:FileOutputStream ->
+            fos.write(gson.toJson(jsonFormat).toByteArray())
+        }
         return fileStorageUtility.saveFile(parentDir, jsonFilename,
-            json
+            writer
         )
-        TODO("finish impl")
+        return ""
     }
 
     override fun read(filepath: String): Receipt {
