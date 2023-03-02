@@ -4,56 +4,80 @@ import android.content.Context
 import com.example.rc_app.entity.receipt.Receipt
 import com.google.api.client.json.Json
 import com.google.gson.Gson
-import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
-class ReceiptLogDataSource(val context: Context) : DataSource<Receipt> {
+class ReceiptLogDataSource(val context: Context) {
 
     private val parentDir = "receiptLogDir"
     private val jsonFilename = "log.json"
-    private val fileStorageUtility: FileStorageDataSource<Receipt> = InternalFileStorageDataSource(context)
+    private val fileStorageUtility: FileStorageDataSource<Receipt> =
+        InternalFileStorageDataSource(context)
 
-    private class JsonFormat(val week_beg: String, val receipts: MutableList<Receipt>) {
-        fun addReceipt(receipt: Receipt) {
-            receipts.add(receipt)
-        }
-        fun removeReceipt(receipt: Receipt) {
-            receipts.remove(receipt)
-        }
-    }
+    private class JsonFormat(val week_beg: Long, var total: Int)
 
-    override fun save(entity: Receipt): String {
+    fun save(): String {
 //        create a gson object
         val gson = Gson()
         val initialFile = fileStorageUtility.getFile(parentDir, jsonFilename)
-        var jsonFormat: JsonFormat
-        if (initialFile.exists()) {
-            jsonFormat = gson.fromJson(initialFile.inputStream().readBytes().toString(), JsonFormat::class.java)
-            jsonFormat.receipts.add(entity)
+        val jsonFormat: JsonFormat = if (initialFile.exists()) {
+            val jsonString = String(initialFile.inputStream().readBytes())
+            gson.fromJson(jsonString, JsonFormat::class.java)
         } else {
-            jsonFormat = JsonFormat(entity.datetimeToString(), mutableListOf(entity))
+            val c = Calendar.getInstance()
+            c[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
+            JsonFormat(c.time.time, 0)
         }
 
-        val writer: (FileOutputStream) -> Unit = {fos:FileOutputStream ->
+        jsonFormat.total += 1
+
+        val writer: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
             fos.write(gson.toJson(jsonFormat).toByteArray())
         }
-        return fileStorageUtility.saveFile(parentDir, jsonFilename,
+        return fileStorageUtility.saveFile(
+            parentDir, jsonFilename,
             writer
         )
-        return ""
     }
 
-    override fun read(filepath: String): Receipt {
-        TODO("Not yet implemented")
-    }
-
-    override fun delete(entity: Receipt): Boolean {
-        TODO("Not yet implemented")
+    fun getDate(): Int {
+        val gson = Gson()
+        val c = Calendar.getInstance()
+        c[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
+        val mon = c.time.time
+        val initialFile = fileStorageUtility.getFile(parentDir, jsonFilename)
+        val jsonFormat: JsonFormat = if (initialFile.exists()) {
+            val jsonString = String(initialFile.inputStream().readBytes())
+            gson.fromJson(jsonString, JsonFormat::class.java)
+        } else {
+            JsonFormat(mon, 0)
+            return 0
+        }
+        return jsonFormat.total
     }
 
     fun onAppStart() {
-        TODO("on app start, check if same week. if different week then filter out accepted receipts")
+        val gson = Gson()
+        val c = Calendar.getInstance()
+        c[Calendar.DAY_OF_WEEK] = Calendar.MONDAY
+        val mon = c.time.time
+        val initialFile = fileStorageUtility.getFile(parentDir, jsonFilename)
+        val jsonFormat: JsonFormat = if (initialFile.exists()) {
+            val jsonString = String(initialFile.inputStream().readBytes())
+            gson.fromJson(jsonString, JsonFormat::class.java)
+        } else {
+            JsonFormat(mon, 0)
+        }
 
+        if (jsonFormat.week_beg == mon) return
+
+        val writer: (FileOutputStream) -> Unit = { fos: FileOutputStream ->
+            fos.write(gson.toJson(JsonFormat(mon, 0)).toByteArray())
+        }
+        fileStorageUtility.saveFile(
+            parentDir, jsonFilename,
+            writer
+        )
     }
 
 }

@@ -62,24 +62,30 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         connectivityManager.requestNetwork(networkRequest, networkCallback)
     }
 
-    fun initiateSend() {
-        val receiptQueue: Queue<Receipt> = LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
-        while (isConnected && !receiptQueue.isNullOrEmpty()) {
-            while (!retryTasks.isNullOrEmpty()){
+    fun initiateSend(): Boolean {
+        var hasSent = false
+        val receiptQueue: Queue<Receipt> =
+            LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
+        while (isConnected && !receiptQueue.isEmpty()) {
+            while (!retryTasks.isEmpty()) {
                 val task = retryTasks.poll()
                 val uploadTask = sendToBucket(task.first, task.second)
                 inFlightTasks.add(uploadTask)
             }
-            while (!receiptQueue.isNullOrEmpty()){
+            while (!receiptQueue.isEmpty()) {
                 val receipt = receiptQueue.poll()
                 val uploadTask = sendToBucket(receipt)
                 inFlightTasks.add(uploadTask)
-                galleryRepository.removeReceipt(receipt)
+                hasSent = true
             }
         }
+        return hasSent
     }
 
-    private fun sendToBucket(receipt: Receipt, uploadUri: Uri? = null): StorageTask<UploadTask.TaskSnapshot> {
+    private fun sendToBucket(
+        receipt: Receipt,
+        uploadUri: Uri? = null
+    ): StorageTask<UploadTask.TaskSnapshot> {
         // todo: call api here
 
         val file = galleryRepository.getFileFromReceipt(receipt)
@@ -92,31 +98,31 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         var progress = 0.0
 
 
-        var uploadTask = if (uploadUri != null){
+        val uploadTask = if (uploadUri != null) {
             storageRef.child(receipt.idToString()).putFile(uri, metadata, uploadUri)
         } else {
             storageRef.child(receipt.idToString()).putFile(uri, metadata)
         }
         println(storageRef.path)
 
-
-        uploadTask.addOnSuccessListener {
-            fun successHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+        uploadTask.addOnSuccessListener { taskSnapshot: UploadTask.TaskSnapshot ->
+            run {
                 Toast.makeText(context, "Upload Succeeded", Toast.LENGTH_SHORT).show()
                 inFlightTasks.remove(uploadTask)
+                galleryRepository.removeReceipt(receipt)
             }
         }
-            .addOnFailureListener {
-                fun failureHandler(exception: java.lang.Exception) {
-                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_SHORT)
+            .addOnFailureListener { exception: java.lang.Exception ->
+                run {
+                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_LONG)
                         .show()
                     val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
-                    retryTasks.add(Pair(receipt,uploadSessionURI))
+                    retryTasks.add(Pair(receipt, uploadSessionURI))
                     inFlightTasks.remove(uploadTask)
                 }
             }
-            .addOnProgressListener {
-                fun progressHandler(taskSnapshot: UploadTask.TaskSnapshot) {
+            .addOnProgressListener { taskSnapshot: UploadTask.TaskSnapshot ->
+                run {
                     println(100.0 * (taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount))
                 }
             }
