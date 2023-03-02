@@ -65,9 +65,6 @@ class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): Recycler
 
     override fun onClick(p0: View?) {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-        val fileProvider = FileProvider.getUriForFile(fragment.requireContext(), "com.example.fileprovider", photoFile)
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
         if (takePictureIntent.resolveActivity(fragment.requireContext().packageManager) != null) {
             fragment.startActivityForResult(takePictureIntent, REQUEST_CODE)
         } else {
