@@ -92,7 +92,6 @@ class LandingFragment : Fragment() {
         viewModel.viewLiveData.observe(viewLifecycleOwner) {
             it?.let {
                 headerAdapter.updateWeekCount(it)
-
             }
         }
     }
@@ -103,7 +102,7 @@ class LandingFragment : Fragment() {
 
     private fun getPhotoFile(fileName: String): File {
         val storageDirectory = requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(fileName, ".jpg", storageDirectory)
+        return File.createTempFile(fileName, ".png", storageDirectory)
     }
 
     private suspend fun addReceipt(receipt: Receipt) {
@@ -114,7 +113,12 @@ class LandingFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == CAMERA_CODE && resultCode == Activity.RESULT_OK) {
-            val generatedReceipt = Receipt(data?.extras?.get("data") as Bitmap)
+            val options = BitmapFactory.Options()
+            options.inPreferredConfig = Bitmap.Config.RGB_565
+
+            val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath, options)
+            val generatedReceipt = Receipt(takenImage)
+
 
             runBlocking {
                 Toast.makeText(context, "Saving...", Toast.LENGTH_SHORT).show()

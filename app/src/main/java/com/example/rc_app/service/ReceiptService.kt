@@ -63,7 +63,7 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
     }
 
     fun initiateSend(): Boolean {
-        var hasSent = false
+        val hasSent = false
         val receiptQueue: Queue<Receipt> =
             LinkedList(galleryRepository.getReceiptList().value ?: emptyList())
         while (isConnected && !receiptQueue.isEmpty()) {
@@ -76,7 +76,6 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
                 val receipt = receiptQueue.poll()
                 val uploadTask = sendToBucket(receipt)
                 inFlightTasks.add(uploadTask)
-                hasSent = true
             }
         }
         return hasSent
@@ -114,8 +113,8 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         }
             .addOnFailureListener { exception: java.lang.Exception ->
                 run {
-//                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_LONG)
-//                        .show()
+                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_LONG)
+                        .show()
                     val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
                     retryTasks.add(Pair(receipt, uploadSessionURI))
                     inFlightTasks.remove(uploadTask)

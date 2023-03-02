@@ -8,14 +8,15 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
-import com.example.rc_app.entity.receipt.Receipt
 import java.io.File
 
-private const val FILE_NAME = "photo.jpg"
+
+private const val FILE_NAME = "photo.png"
 private const val REQUEST_CODE = 99
 
 class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): RecyclerView.Adapter<CameraHeaderAdapter.HeaderViewHolder>(), View.OnClickListener {
@@ -65,6 +66,9 @@ class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): Recycler
 
     override fun onClick(p0: View?) {
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        val fileProvider = FileProvider.getUriForFile(fragment.requireContext(), "com.example.fileprovider", photoFile)
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
         if (takePictureIntent.resolveActivity(fragment.requireContext().packageManager) != null) {
             fragment.startActivityForResult(takePictureIntent, REQUEST_CODE)
         } else {
