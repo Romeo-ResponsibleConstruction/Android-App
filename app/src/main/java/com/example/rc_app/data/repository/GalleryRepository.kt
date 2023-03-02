@@ -36,6 +36,12 @@ class GalleryRepository(val context: Context) {
             updatedList.add(0, receipt)
             bufferLiveData.postValue(updatedList)
         }
+        val weekViewNum = weekLiveData.value
+        if (weekViewNum == null) {
+            weekLiveData.postValue(0)
+        } else {
+            weekLiveData.postValue(weekViewNum + 1)
+        }
 
     }
 
