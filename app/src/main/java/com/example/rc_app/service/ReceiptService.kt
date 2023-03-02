@@ -114,8 +114,8 @@ class ReceiptService(val context: Context, val galleryRepository: GalleryReposit
         }
             .addOnFailureListener { exception: java.lang.Exception ->
                 run {
-                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_LONG)
-                        .show()
+//                    Toast.makeText(context, "Failed: " + exception.message, Toast.LENGTH_LONG)
+//                        .show()
                     val uploadSessionURI = uploadTask.snapshot.uploadSessionUri
                     retryTasks.add(Pair(receipt, uploadSessionURI))
                     inFlightTasks.remove(uploadTask)
