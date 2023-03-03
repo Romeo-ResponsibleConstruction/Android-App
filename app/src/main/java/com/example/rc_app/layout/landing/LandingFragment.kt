@@ -4,21 +4,23 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import androidx.fragment.app.Fragment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.rc_app.R
 import com.example.rc_app.data.repository.GalleryRepository
-import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.data.viewModels.ReceiptsViewModel
 import com.example.rc_app.data.viewModels.ReceiptsViewModelFactory
+import com.example.rc_app.entity.receipt.Receipt
 import com.example.rc_app.layout.header.CameraHeaderAdapter
 import com.example.rc_app.service.ReceiptService
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +30,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 private const val FILE_NAME = "photo"
-private const val CAMERA_CODE = 99
+private const val CAMERA_CODE = 1231
+private const val GALLERY_CODE = 1111
 
 class LandingFragment : Fragment() {
     private lateinit var galleryRepository: GalleryRepository
@@ -105,6 +108,8 @@ class LandingFragment : Fragment() {
         return File.createTempFile(fileName, ".png", storageDirectory)
     }
 
+
+
     private suspend fun addReceipt(receipt: Receipt) {
         return withContext(Dispatchers.IO) {
             viewModel.addReceipt(receipt)
@@ -119,6 +124,21 @@ class LandingFragment : Fragment() {
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath, options)
             val generatedReceipt = Receipt(takenImage)
 
+            runBlocking {
+                Toast.makeText(context, "Saving...", Toast.LENGTH_SHORT).show()
+
+                launch {
+                    addReceipt(generatedReceipt)
+                    Toast.makeText(context, "Photo successfully saved!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        } else if (requestCode == GALLERY_CODE && resultCode == Activity.RESULT_OK) {
+            val options = BitmapFactory.Options()
+            options.inPreferredConfig = Bitmap.Config.RGB_565
+
+            val takenImage = BitmapFactory.decodeFile(data?.data.toString(), options)
+            val generatedReceipt = Receipt(takenImage)
 
             runBlocking {
                 Toast.makeText(context, "Saving...", Toast.LENGTH_SHORT).show()
@@ -126,13 +146,11 @@ class LandingFragment : Fragment() {
                 launch {
                     addReceipt(generatedReceipt)
                     Toast.makeText(context, "Photo successfully saved!", Toast.LENGTH_SHORT).show()
-
                 }
+            }
 
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+            super.onActivityResult(requestCode, resultCode, data);
+
         }
     }
-
-}

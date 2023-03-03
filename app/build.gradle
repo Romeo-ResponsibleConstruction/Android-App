@@ -50,6 +50,7 @@ android {
 
 dependencies {
     implementation 'com.google.firebase:firebase-common-ktx:20.1.0'
+    implementation 'androidx.databinding:library:3.2.0-alpha11'
     def nav_version = "2.5.3"
 
     implementation 'androidx.core:core-ktx:1.7.0'
