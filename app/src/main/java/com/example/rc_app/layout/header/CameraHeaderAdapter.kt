@@ -17,7 +17,8 @@ import java.io.File
 
 
 private const val FILE_NAME = "photo.png"
-private const val REQUEST_CODE = 99
+private const val CAMERA_CODE = 1231
+private const val GALLERY_CODE = 1111
 
 class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): RecyclerView.Adapter<CameraHeaderAdapter.HeaderViewHolder>(), View.OnClickListener {
 
@@ -65,15 +66,42 @@ class CameraHeaderAdapter(val fragment: Fragment, val photoFile: File): Recycler
     }
 
     override fun onClick(p0: View?) {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (p0 != null) {
+            when (p0.id) {
+                R.id.btnOpenCamera -> {
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-        val fileProvider = FileProvider.getUriForFile(fragment.requireContext(), "com.example.fileprovider", photoFile)
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
-        if (takePictureIntent.resolveActivity(fragment.requireContext().packageManager) != null) {
-            fragment.startActivityForResult(takePictureIntent, REQUEST_CODE)
-        } else {
-            Toast.makeText(fragment.requireContext(), "Unable to open camera.", Toast.LENGTH_SHORT).show()
+                    val fileProvider = FileProvider.getUriForFile(fragment.requireContext(), "com.example.fileprovider", photoFile)
+                    cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+                    if (cameraIntent.resolveActivity(fragment.requireContext().packageManager) != null) {
+                        fragment.startActivityForResult(cameraIntent, CAMERA_CODE)
+                    } else {
+                        Toast.makeText(fragment.requireContext(), "Unable to open camera.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                R.id.btnOpenGallery -> {
+                    /*
+                    val galleryIntent = Intent(Intent.ACTION_PICK)
+                    galleryIntent.type = "image/*"
+
+                    val fileProvider = FileProvider.getUriForFile(fragment.requireContext(), "com.example.fileprovider", photoFile)
+                    galleryIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+                    fragment.startActivityForResult(galleryIntent, GALLERY_CODE)
+
+                     */
+
+                     */
+
+                    val intent = Intent(Intent.ACTION_PICK)
+                    intent.type = "image/*"
+                    fragment.startActivityForResult(Intent.createChooser(intent, "Select Picture"), GALLERY_CODE)
+                    print("Works")
+
+                }
+                else -> {}
+            }
         }
+
     }
 
 }
